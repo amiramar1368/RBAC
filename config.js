@@ -1,0 +1,4 @@
+export const {DB_NAME,DB_USERNAME,DB_PASSWORD,DB_DIALECT,PORT,ACCESS_TOKEN} = process.env;
+
+
+
