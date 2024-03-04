@@ -3,6 +3,7 @@ import { userValidator } from "../utils/input-validator.js";
 
 export class UserController {
   static async fetchAllUsers(req, res) {
+    console.log(10,req.user);
     try {
       const users = await req.models.User.findAll({
         include: [req.models.Role],
@@ -27,6 +28,7 @@ export class UserController {
       });
     } catch (err) {
       //check validator error
+      console.log(err);
       if (err.errors.length) {
         return res.sendError({ statusCode: 400, message: err.errors[0] });
       }

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-import { ACCESS_TOKEN } from "../config.js";
+import { ACCESS_TOKEN,REFRESH_TOKEN,ACCESS_TOKEN_EXPIRE,REFRESH_TOKEN_EXPIRE } from "../config.js";
 
 export const setToken = async (req, res, next) => {
   const { login, password } = req.body;
@@ -37,16 +37,20 @@ export const setToken = async (req, res, next) => {
       allPermissions.forEach((item) => {
         permissions.push(item.permission.name);
       });
+      const loginUser = {id:user.id, name: user.name, role: user.role.name, login: user.login, permissions };
+      const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: `${ACCESS_TOKEN_EXPIRE}s` });
 
-      const loginUser = { name: user.name, role: user.role.name, login: user.login, permissions };
-      const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: "30m" });
+      await req.models.RefreshToken.destroy({where:{user_id:user.id}})
+      const refreshToken  =await req.models.RefreshToken.createToken(user.id)
       req.loginUser = loginUser;
       req.token = token;
+      req.refreshToken = refreshToken;
       next();
     } else {
       return res.sendError({statusCode:404,message:"User Not Found"})
     }
   } catch (err) {
+    console.log(err);
     res.sendError({statusbar:500,message:err.message})
   }
 };

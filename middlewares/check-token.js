@@ -1,22 +1,72 @@
 import jwt from "jsonwebtoken";
 
-import { ACCESS_TOKEN } from "../config.js";
+import { ACCESS_TOKEN, ACCESS_TOKEN_EXPIRE } from "../config.js";
 
 export default async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
     const token = authorization?.split(" ")[1] || undefined;
     if (token == undefined) {
-      return res.sendError({statusCode:401,messege:"UnAuthorized"})
+      return res.sendError({ statusCode: 401, messege: "UnAuthorized" });
     }
-    await jwt.verify(token, ACCESS_TOKEN, (err, user) => {
+    console.log(1);
+    jwt.verify(token, ACCESS_TOKEN, async (err, user) => {
       if (err) {
-        return res.sendError({statusCode:401,messege:"Invalid Token"});
+        const refreshToken = req.headers["refreshtoken"];
+        if (!refreshToken) {
+          return res.sendError({ statusCode: 401, messege: "No Refresh Token provided" });
+        }
+        const refreshTokenRecord = await req.models.RefreshToken.findOne({
+          where: { token: refreshToken },
+          include: {
+            model: req.models.User,
+            include: {
+              model: req.models.Role,
+              include: [
+                {
+                  model: req.models.RolePermission,
+                  association: "permissionsRoles",
+                  include: [req.models.Permission],
+                },
+              ],
+            },
+          },
+        });
+        if (!refreshTokenRecord) {
+          return res.sendError({ statusCode: 403, messege: "Invalid Refresh Token" });
+        }
+        const refreshTokenIsValid = req.models.RefreshToken.checkExpiration(refreshTokenRecord);
+        const user =refreshTokenRecord.user
+        if (refreshTokenIsValid) {
+        const permissions = [];
+        const allPermissions =user.role.permissionsRoles;
+        allPermissions.forEach((item) => {
+          permissions.push(item.permission.name);
+        });
+          const loginUser = { id: user.id, name: user.name, role: user.role.name, login: user.login, permissions };
+          const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: `${ACCESS_TOKEN_EXPIRE}s` });
+
+          //remove all records belong to this user
+          await req.models.RefreshToken.destroy({where:{
+            user_id:user.id
+          }})
+          const refreshToken = await req.models.RefreshToken.createToken(user.id);
+          req.loginUser = loginUser;
+          req.token = token;
+          req.refreshToken = refreshToken;
+          next();
+        }else{
+          await req.models.RefreshToken.destroy({where:{
+            user_id:user.id
+          }})
+          return res.sendError({ statusCode: 401, messege: "Invalid Token" });
+        }
       }
       req.user = user;
       next();
     });
   } catch (err) {
-    return res.sendError({statusCode:500,messege:err.messege});
+    console.log(1020);
+    return res.sendError({ statusCode: 500, messege: err.messege });
   }
 };

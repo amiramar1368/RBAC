@@ -5,21 +5,20 @@ import { userModel } from "./user.js";
 import { permissionModel } from "./permission.js";
 import { roleModel } from "./role.js";
 import { rolePermissionModel } from "./role-permission.js";
+import {RefreshTokenModel} from './refresh-token.js';
 
-const create_db = new Sequelize("", DB_USERNAME, DB_PASSWORD, { dialect: DB_DIALECT });
-let sequelize;
-try {
+const create_db = new Sequelize("", DB_USERNAME, DB_PASSWORD, { dialect: DB_DIALECT,timezone: '+03:30' });
+
   await create_db.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME}`);
-  sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, { dialect: DB_DIALECT });
-} catch (error) {
-    process.exit()
-}
+  let sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, { dialect: DB_DIALECT });
+
 
 const models = {
   Role: roleModel(sequelize, Sequelize),
   Permission: permissionModel(sequelize, Sequelize),
   RolePermission: rolePermissionModel(sequelize, Sequelize),
   User: userModel(sequelize, Sequelize),
+  RefreshToken: RefreshTokenModel(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((modelName) => {
