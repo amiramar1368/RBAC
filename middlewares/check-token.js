@@ -4,17 +4,21 @@ import { ACCESS_TOKEN, ACCESS_TOKEN_EXPIRE } from "../config.js";
 
 export default async (req, res, next) => {
   try {
-    const authorization = req.headers.authorization;
+    const authorization = req.headers["authorization"];
     const token = authorization?.split(" ")[1] || undefined;
-    if (token == undefined) {
-      return res.sendError({ statusCode: 401, messege: "UnAuthorized" });
+    const refreshToken = req.headers["refreshtoken"];
+
+    if (!token || !refreshToken) {
+      return res.sendError({ statusCode: 401, message: "No Token Or Refresh Token Provided" });
     }
-    console.log(1);
+    res.setHeader("token",`Bearer ${token}`);
+    res.setHeader("refreshToken",refreshToken);
+
     jwt.verify(token, ACCESS_TOKEN, async (err, user) => {
       if (err) {
         const refreshToken = req.headers["refreshtoken"];
         if (!refreshToken) {
-          return res.sendError({ statusCode: 401, messege: "No Refresh Token provided" });
+          return res.sendError({ statusCode: 401, message: "No Refresh Token Provided" });
         }
         const refreshTokenRecord = await req.models.RefreshToken.findOne({
           where: { token: refreshToken },
@@ -33,10 +37,10 @@ export default async (req, res, next) => {
           },
         });
         if (!refreshTokenRecord) {
-          return res.sendError({ statusCode: 403, messege: "Invalid Refresh Token" });
+          return res.sendError({ statusCode: 403, message: "Invalid Refresh Token. Please Relogin" });
         }
-        const refreshTokenIsValid = req.models.RefreshToken.checkExpiration(refreshTokenRecord);
         const user =refreshTokenRecord.user
+        const refreshTokenIsValid = req.models.RefreshToken.checkExpiration(refreshTokenRecord);
         if (refreshTokenIsValid) {
         const permissions = [];
         const allPermissions =user.role.permissionsRoles;
@@ -50,23 +54,25 @@ export default async (req, res, next) => {
           await req.models.RefreshToken.destroy({where:{
             user_id:user.id
           }})
+
           const refreshToken = await req.models.RefreshToken.createToken(user.id);
-          req.loginUser = loginUser;
-          req.token = token;
-          req.refreshToken = refreshToken;
+          res.setHeader("token",`Bearer ${token}`);
+          res.setHeader("refreshToken",refreshToken);
+          req.user =loginUser
           next();
         }else{
           await req.models.RefreshToken.destroy({where:{
             user_id:user.id
           }})
-          return res.sendError({ statusCode: 401, messege: "Invalid Token" });
+          return res.sendError({ statusCode: 401, message: "Invalid Token" });
         }
+      }else{
+        req.user = user;
+        next();
       }
-      req.user = user;
-      next();
     });
   } catch (err) {
     console.log(1020);
-    return res.sendError({ statusCode: 500, messege: err.messege });
+    return res.sendError({ statusCode: 500, message: err.message });
   }
 };

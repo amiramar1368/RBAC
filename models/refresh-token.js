@@ -6,11 +6,6 @@ export const RefreshTokenModel = (sequelize, { DataTypes }) => {
   const refreshToken = sequelize.define(
     "refresh_token",
     {
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -36,8 +31,6 @@ export const RefreshTokenModel = (sequelize, { DataTypes }) => {
   refreshToken.checkExpiration = (token) => {
     return token.expiryDate > new Date();
   };
-
-  //   refreshToken.sync({ alter: true });
 
   refreshToken.associate = (models) => {
     refreshToken.belongsTo(models.User, {

@@ -1,0 +1,13 @@
+POST http://localhost:3100/users/login
+Content-Type: application/json
+    
+{
+    "login":"amir",
+    "password":"123"
+}
+
+###
+
+GET http://localhost:3100/api/v1/users
+authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFtaXIgYW1hcmxvbyIsInJvbGUiOiJhZG1pbiIsImxvZ2luIjoiYW1pciIsInBlcm1pc3Npb25zIjpbImZldGNoVXNlciJdLCJpYXQiOjE3MDk2Mzg5NTQsImV4cCI6MTcwOTYzODk3NH0.plphVBLACp27dqGN8UEM-FbsZyLUMxPsgAbYqB0U7Fg
+refreshtoken:f15797f7-a789-4087-84e6-7d061c96f72c

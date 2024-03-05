@@ -30,7 +30,7 @@ export const userModel= (sequelize,{DataTypes})=>{
     timestamps:false
   })
 
-  // sequelize.sync({alter:true})
+  sequelize.sync({alter:true})
 
   user.associate = models=>{
     user.belongsTo(models.Role,{foreignKey:{name:"role_id",onDelete:"NO ACTION", onUpdate:"CASCADE"}})

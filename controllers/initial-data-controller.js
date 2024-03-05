@@ -18,7 +18,7 @@ export async function insertInitialData() {
             name:"fetchUser"
         },
         defaults:{
-            name:"addUser"
+            name:"fetchUser"
         }
     })
 

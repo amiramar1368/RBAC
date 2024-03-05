@@ -3,7 +3,6 @@ import { userValidator } from "../utils/input-validator.js";
 
 export class UserController {
   static async fetchAllUsers(req, res) {
-    console.log(10,req.user);
     try {
       const users = await req.models.User.findAll({
         include: [req.models.Role],
