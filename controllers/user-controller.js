@@ -27,9 +27,8 @@ export class UserController {
       });
     } catch (err) {
       //check validator error
-      console.log(err);
       if (err.errors.length) {
-        return res.sendError({ statusCode: 400, message: err.errors[0] });
+        return res.sendError({ statusCode: 400, message: [...err.errors] });
       }
       return res.sendError({ statusCode: 500, message: err.message });
     }
