@@ -64,7 +64,7 @@ export default async (req, res, next) => {
           await req.models.RefreshToken.destroy({where:{
             user_id:user.id
           }})
-          return res.sendError({ statusCode: 401, message: "Invalid Token" });
+          return res.sendError({ statusCode: 401, message: "Invalid Token Please Login Again" });
         }
       }else{
         req.user = user;
@@ -72,7 +72,6 @@ export default async (req, res, next) => {
       }
     });
   } catch (err) {
-    console.log(1020);
     return res.sendError({ statusCode: 500, message: err.message });
   }
 };

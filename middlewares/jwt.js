@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { Op } from "@sequelize/core";
 
 import { ACCESS_TOKEN,ACCESS_TOKEN_EXPIRE } from "../config.js";
 
@@ -11,7 +12,9 @@ export const setToken = async (req, res, next) => {
   }
     const user = await req.models.User.findOne({
       where: {
-        login,
+        login:{
+          [Op.eq]:login
+        },
       },
       include: [
         {
