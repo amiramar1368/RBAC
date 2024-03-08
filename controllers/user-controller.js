@@ -8,9 +8,9 @@ export class UserController {
         include: [req.models.Role],
         attributes: ["id", "name", "login"],
       });
-      res.status(200).json({ success: true, body: users, message: "All Users Fetch Successfully" });
+      return res.sendSuccess(200,"All Users Fetch Successfully" ,users)
     } catch (err) {
-      res.sendError({ statusCode: 500, message: err.message });
+      return res.sendError();
     }
   }
 
@@ -20,17 +20,17 @@ export class UserController {
       const { password } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await req.models.User.create({ ...req.body, password: hashedPassword });
-      res.status(201).json({
-        success: true,
-        body: user.id,
-        message: "New User Add Successfully",
-      });
+      return res.sendSuccess(201,"New User Add Successfully",user.id)
+      
     } catch (err) {
       //check validator error
-      if (err.errors.length) {
-        return res.sendError({ statusCode: 400, message: [...err.errors] });
+      if (err.errors[0]?.type==="unique violation") {
+        return res.sendError(400,err.message)
       }
-      return res.sendError({ statusCode: 500, message: err.message });
+      if (err.errors instanceof Array) {
+        return res.sendError(400,[...err.errors])
+      }
+      return res.sendError()
     }
   }
 }

@@ -8,7 +8,7 @@ export const setToken = async (req, res, next) => {
   const { login, password } = req.body;
   try {
   if (login == undefined || password == undefined) {
-   return res.sendError({statusCode:400,message:"login and password are required"})
+   return res.sendError(400,"login and password are required")
   }
     const user = await req.models.User.findOne({
       where: {
@@ -32,7 +32,7 @@ export const setToken = async (req, res, next) => {
     if (user) {
       const passwordIsMatch = await bcrypt.compare(password, user.password);
       if (!passwordIsMatch) {
-        return res.sendError({statusCode:404,message:"login or password is wrong"})
+        return res.sendError(404,"login or password is wrong")
       }
       const permissions = [];
       const allPermissions = user.role.permissionsRoles;
@@ -48,9 +48,9 @@ export const setToken = async (req, res, next) => {
       req.loginUser = loginUser;
       next();
     } else {
-      return res.sendError({statusCode:404,message:"User Not Found"})
+      return res.sendError(404,"User Not Found")
     }
   } catch (err) {
-    res.sendError({statusbar:500,message:err.message})
+    res.sendError()
   }
 };

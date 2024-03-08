@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import {models} from '../models/db.js';
 
 export async function insertInitialData() {
-
     await models.Role.findOrCreate({
         where:{
             name:"admin"

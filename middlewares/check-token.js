@@ -9,7 +9,7 @@ export default async (req, res, next) => {
     const refreshToken = req.headers["refreshtoken"];
 
     if (!token || !refreshToken) {
-      return res.sendError({ statusCode: 401, message: "No Token Or Refresh Token Provided" });
+      return res.sendError( 401, "No Token Or Refresh Token Provided");
     }
     res.setHeader("token",`Bearer ${token}`);
     res.setHeader("refreshToken",refreshToken);
@@ -18,7 +18,7 @@ export default async (req, res, next) => {
       if (err) {
         const refreshToken = req.headers["refreshtoken"];
         if (!refreshToken) {
-          return res.sendError({ statusCode: 401, message: "No Refresh Token Provided" });
+          return res.sendError( 401,"No Refresh Token Provided");
         }
         const refreshTokenRecord = await req.models.RefreshToken.findOne({
           where: { token: refreshToken },
@@ -37,7 +37,7 @@ export default async (req, res, next) => {
           },
         });
         if (!refreshTokenRecord) {
-          return res.sendError({ statusCode: 403, message: "Invalid Refresh Token. Please Relogin" });
+          return res.sendError(403, "Invalid Refresh Token. Please Relogin");
         }
         const user =refreshTokenRecord.user
         const refreshTokenIsValid = req.models.RefreshToken.checkExpiration(refreshTokenRecord);
@@ -64,7 +64,7 @@ export default async (req, res, next) => {
           await req.models.RefreshToken.destroy({where:{
             user_id:user.id
           }})
-          return res.sendError({ statusCode: 401, message: "Invalid Token Please Login Again" });
+          return res.sendError( 401, "Invalid Token Please Login Again");
         }
       }else{
         req.user = user;
@@ -72,6 +72,6 @@ export default async (req, res, next) => {
       }
     });
   } catch (err) {
-    return res.sendError({ statusCode: 500, message: err.message });
+    return res.sendError();
   }
 };

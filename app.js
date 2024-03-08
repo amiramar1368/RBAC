@@ -1,19 +1,19 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import "dotenv/config.js"
 
 import { PORT } from "./config.js";
 import { models } from "./models/db.js";
-import loginRouter from './routes/login.controller.routes.js';
-import allRouter from './routes/allroutes.v1.routes.js';
+import loginRouter from './routes/login-controller-routes.js';
+import allRouter from './routes/allroutes-v1.js';
 import checkToken from './middlewares/check-token.js';
-import errorHandler from './middlewares/errorHandler.js';
+import sendResponse from './middlewares/send-response.js';
+import sendError from './middlewares/error-handler.js';
 
 
 const app = express();
 
-app.use(cookieParser());
-app.use(errorHandler);
+app.use(sendResponse);
+app.use(sendError);
 
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());

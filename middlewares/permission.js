@@ -6,7 +6,7 @@ export function permission(permit) {
       return permitSet.has(permission);
     });
     if (!hasAccess) {
-      return res.sendError({statusCode:403,message:"you don't have access to this part"})
+      return res.sendError(403,"you don't have access to this part")
     }
     next();
   };

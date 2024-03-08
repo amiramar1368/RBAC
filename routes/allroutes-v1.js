@@ -1,13 +1,13 @@
 import {Router} from 'express';
-import 'express-group-routes';
 
 import {UserController} from '../controllers/user-controller.js';
 import {permission} from '../middlewares/permission.js';
+
 const router = new Router();
 
-router.group("/users",(router)=>{
-    router.get("/",permission(["fetchUser"]),UserController.fetchAllUsers);
-    router.post("/",UserController.addUser)
-})
+router.route('/users')
+  .get(permission(["fetchUser"]),UserController.fetchAllUsers)
+  .post(UserController.addUser)
+
 
 export default router;
