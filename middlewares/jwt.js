@@ -2,6 +2,12 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { Op } from "@sequelize/core";
 
+// import {sequelize} from '../models/db.js';
+import {User} from '../models/user.js';
+import {RefreshToken} from '../models/refresh-token.js';
+import {Role} from '../models/role.js';
+import {RolePermission} from '../models/role-permission.js';
+import {Permission} from '../models/permission.js';
 import { ACCESS_TOKEN, ACCESS_TOKEN_EXPIRE } from "../config.js";
 
 export const setToken = async (req, res, next) => {
@@ -29,7 +35,7 @@ export const setToken = async (req, res, next) => {
     // mysql
     
     // const loginUser = {};
-    // const user = await req.models.sequelize.query("CALL login(:login)", {
+    // const user = await sequelize.query("CALL login(:login)", {
     //   replacements: { login },
     // });
     // if (user.length > 0) {
@@ -48,8 +54,8 @@ export const setToken = async (req, res, next) => {
     //     loginUser.permissions.push(user[i].permission);
     //   }
     //   const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: `${ACCESS_TOKEN_EXPIRE}s` });
-    //   await req.models.RefreshToken.destroy({ where: { user_id: user[0].id } });
-    //   const refreshToken = await req.models.RefreshToken.createToken(user[0].id);
+    //   await RefreshToken.destroy({ where: { user_id: user[0].id } });
+    //   const refreshToken = await RefreshToken.createToken(user[0].id);
     //   res.setHeader("token", `Bearer ${token}`);
     //   res.setHeader("refreshToken", refreshToken);
     //   req.loginUser = loginUser;
@@ -60,7 +66,7 @@ export const setToken = async (req, res, next) => {
     //
 
     // second manner
-    const user = await req.models.User.findOne({
+    const user = await User.findOne({
       where: {
         login: {
           [Op.eq]: login,
@@ -68,12 +74,12 @@ export const setToken = async (req, res, next) => {
       },
       include: [
         {
-          model: req.models.Role,
+          model: Role,
           include: [
             {
-              model: req.models.RolePermission,
+              model:RolePermission,
               association: "permissionsRoles",
-              include: [req.models.Permission],
+              include: [Permission],
             },
           ],
         },
@@ -91,11 +97,13 @@ export const setToken = async (req, res, next) => {
       });
       const loginUser = { id: user.id, name: user.name, role: user.role.name, login: user.login, permissions };
       const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: `${ACCESS_TOKEN_EXPIRE}s` });
-      await req.models.RefreshToken.destroy({ where: { user_id: user.id } });
-      const refreshToken = await req.models.RefreshToken.createToken(user.id);
-      res.setHeader("token", `Bearer ${token}`);
-      res.setHeader("refreshToken", refreshToken);
-      req.loginUser = loginUser;
+      await RefreshToken.destroy({ where: { user_id: user.id } });
+      const refreshToken = await RefreshToken.createToken(user.id);
+      req.resultData = {
+        loginUser,
+        token,
+        refreshToken
+      }
       next();
     } else {
       return res.sendError(404, "User Not Found");

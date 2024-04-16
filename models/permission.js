@@ -1,5 +1,8 @@
-export const permissionModel= (sequelize,{DataTypes})=>{
-  const permission = sequelize.define("permission",{
+import {DataTypes} from '@sequelize/core';
+
+import {sequelize} from './db.js';
+
+export const Permission = sequelize.define("permission",{
     id:{
       type:DataTypes.INTEGER,
       autoIncrement:true,
@@ -9,6 +12,3 @@ export const permissionModel= (sequelize,{DataTypes})=>{
   },{
     timestamps:false
   })
-
-  return permission;
-}

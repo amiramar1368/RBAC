@@ -1,9 +1,12 @@
 import bcrypt from 'bcrypt';
 
-import {models} from '../models/db.js';
+import {User} from '../models/user.js';
+import {Role} from '../models/role.js';
+import {RolePermission} from '../models/role-permission.js';
+import {Permission} from '../models/permission.js'
 
 export async function insertInitialData() {
-    await models.Role.findOrCreate({
+    await Role.findOrCreate({
         where:{
             name:"admin"
         },
@@ -12,7 +15,7 @@ export async function insertInitialData() {
         }
     })
 
-    await models.Permission.findOrCreate({
+    await Permission.findOrCreate({
         where:{
             name:"fetchUser"
         },
@@ -22,7 +25,7 @@ export async function insertInitialData() {
     })
 
     const password = await bcrypt.hash("123",10)
-    await models.User.findOrCreate({
+    await User.findOrCreate({
         where:{
             login:"amir"
         },
@@ -34,7 +37,7 @@ export async function insertInitialData() {
         }
     })
 
-    await models.RolePermission.findOrCreate({
+    await RolePermission.findOrCreate({
         where:{
             role_id:1,
             permission_id:1,

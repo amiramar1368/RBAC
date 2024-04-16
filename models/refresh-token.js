@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
+import {DataTypes} from '@sequelize/core';
 
 import { REFRESH_TOKEN_EXPIRE } from "../config.js";
+import {sequelize} from './db.js';
+import {User} from './user.js';
 
-export const RefreshTokenModel = (sequelize, { DataTypes }) => {
-  const refreshToken = sequelize.define(
+ export const RefreshToken = sequelize.define(
     "refresh_token",
     {
       user_id: {
@@ -16,11 +18,11 @@ export const RefreshTokenModel = (sequelize, { DataTypes }) => {
     {}
   );
 
-  refreshToken.createToken = async (user_id) => {
+  RefreshToken.createToken = async (user_id) => {
     let expireAt = new Date();
     expireAt.setSeconds(expireAt.getSeconds() + Number(REFRESH_TOKEN_EXPIRE));
     const token = uuidv4();
-    await refreshToken.create({
+    await RefreshToken.create({
       user_id,
       token,
       expiryDate: expireAt,
@@ -28,15 +30,10 @@ export const RefreshTokenModel = (sequelize, { DataTypes }) => {
     return token;
   };
 
-  refreshToken.checkExpiration = (token) => {
+  RefreshToken.checkExpiration = (token) => {
     return token.expiryDate > new Date();
   };
 
-  refreshToken.associate = (models) => {
-    refreshToken.belongsTo(models.User, {
+    RefreshToken.belongsTo(User, {
       foreignKey: { name: "user_id", onDelete: "NO ACTION", onUpdate: "CASCADE" },
     });
-  };
-
-  return refreshToken;
-};

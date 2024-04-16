@@ -7,7 +7,6 @@ const router = new Router();
 
 router.route('/users')
   .get(permission(["fetchUser"]),UserController.fetchAllUsers)
-  .post(UserController.addUser)
-
+  .post(permission(["addUser"]),UserController.addUser);
 
 export default router;

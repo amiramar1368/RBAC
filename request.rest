@@ -1,6 +1,6 @@
 POST http://localhost:3100/users/login
 Content-Type: application/json
-    
+
 {
     "login":"amir",
     "password":"123"
@@ -9,5 +9,24 @@ Content-Type: application/json
 ###
 
 GET http://localhost:3100/api/v1/users
-authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFtaXIgYW1hcmxvbyIsInJvbGUiOiJhZG1pbiIsImxvZ2luIjoiYW1pciIsInBlcm1pc3Npb25zIjpbImZldGNoVXNlciJdLCJpYXQiOjE3MDk2Mzg5NTQsImV4cCI6MTcwOTYzODk3NH0.plphVBLACp27dqGN8UEM-FbsZyLUMxPsgAbYqB0U7Fg
-refreshtoken:f15797f7-a789-4087-84e6-7d061c96f72c
+authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFtaXIgYW1hcmxvbyIsIJvbGUiOiJhZG1pbiIsImxvZ2luIjoiYW1pciIsInBlcm1pc3Npb25zIjpbImZldGNoVXNlciIsImFkZFVzZXIiLCJ1cGRhdGVVc2VyIl0sImlhdCI6MTcxMzMxMDc3MCwiZXhwIjoxNzEzMzEyNzcwfQ.9yV2Hycx-IACH1GICGQLgK1195h9-QSCinXCuYONKg0
+refreshtoken:84ad31f3-093c-443e-8f28-a135f43d1d7a
+
+###
+POST http://localhost:3100/api/v1/users
+authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6ImFtaXIgYW1hcmxvbyIsInJvbGUiOiJhZG1pbiIsImxvZ2luIjoiYW1pciIsInBlcm1pc3Npb25zIjpbImZldGNoVXNlciIsImFkZFVzZXIiLCJ1cGRhdGVVc2VyIl0sImlhdCI6MTcxMzMxMDE1NSwiZXhwIjoxNzEzMzEyMTU1fQ.d0tOGXgamFgVG5tKEG_AHjceASG59hwpQqr_xyqLXH8   
+refreshtoken:b275bf56-90dd-4a6a-97cc-2ee35916eaea
+Content-Type: application/json
+
+{
+    "name":"amiwqewr",
+    "login":"sdff",
+    "password":"123wdq",
+    "role_id":1
+}
+
+###
+
+GET http://localhost:3100/api/v1/test
+authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6ImFzYWQiLCJyb2xlIjoidXNlciIsImxvZ2luIjoiYXNhZCIsInBlcm1pc3Npb25zIjpbImZldGNoVXNlciJdLCJpYXQiOjE3MTAxODczMjgsImV4cCI6MTcxMDE4OTMyOH0.hlv08CXvVzTJM8Ml1JWoEcT6qmw4qEL4moXyL32dKeM   
+refreshtoken:f4fcf929-5b1a-47cc-9a22-711e2a46f51c 

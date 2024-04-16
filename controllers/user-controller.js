@@ -1,11 +1,14 @@
 import bcrypt from "bcrypt";
+
+import {User} from '../models/user.js';
+import {Role} from '../models/role.js';
 import { userValidator } from "../utils/input-validator.js";
 
 export class UserController {
   static async fetchAllUsers(req, res) {
     try {
-      const users = await req.models.User.findAll({
-        include: [req.models.Role],
+      const users = await User.findAll({
+        include: [Role],
         attributes: ["id", "name", "login"],
       });
       return res.sendSuccess(200,"All Users Fetch Successfully" ,users)
@@ -17,11 +20,10 @@ export class UserController {
   static async addUser(req, res) {
     try {
       await userValidator.validate(req.body, { abortEarly: false });
-      const { password } = req.body;
+      const {name,login,role_id, password } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await req.models.User.create({ ...req.body, password: hashedPassword });
+      const user = await User.create({ name,login,role_id, password: hashedPassword });
       return res.sendSuccess(201,"New User Add Successfully",user.id)
-      
     } catch (err) {
       //check validator error
       if (err.errors[0]?.type==="unique violation") {

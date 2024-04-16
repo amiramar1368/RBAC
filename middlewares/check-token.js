@@ -1,5 +1,11 @@
 import jwt from "jsonwebtoken";
 
+import {User} from '../models/user.js';
+import {RefreshToken} from '../models/refresh-token.js';
+import {Role} from '../models/role.js';
+import {RolePermission} from '../models/role-permission.js';
+import {Permission} from '../models/permission.js';
+
 import { ACCESS_TOKEN, ACCESS_TOKEN_EXPIRE } from "../config.js";
 
 export default async (req, res, next) => {
@@ -7,7 +13,6 @@ export default async (req, res, next) => {
     const authorization = req.headers["authorization"];
     const token = authorization?.split(" ")[1] || undefined;
     const refreshToken = req.headers["refreshtoken"];
-
     if (!token || !refreshToken) {
       return res.sendError( 401, "No Token Or Refresh Token Provided");
     }
@@ -20,27 +25,27 @@ export default async (req, res, next) => {
         if (!refreshToken) {
           return res.sendError( 401,"No Refresh Token Provided");
         }
-        const refreshTokenRecord = await req.models.RefreshToken.findOne({
+        const refreshTokenRecord = await RefreshToken.findOne({
           where: { token: refreshToken },
           include: {
-            model: req.models.User,
+            model: User,
             include: {
-              model: req.models.Role,
+              model: Role,
               include: [
                 {
-                  model: req.models.RolePermission,
+                  model: RolePermission,
                   association: "permissionsRoles",
-                  include: [req.models.Permission],
+                  include: [Permission],
                 },
               ],
             },
           },
         });
         if (!refreshTokenRecord) {
-          return res.sendError(403, "Invalid Refresh Token. Please Relogin");
+          return res.sendError(401, "Invalid Refresh Token. Please Relogin");
         }
         const user =refreshTokenRecord.user
-        const refreshTokenIsValid = req.models.RefreshToken.checkExpiration(refreshTokenRecord);
+        const refreshTokenIsValid = RefreshToken.checkExpiration(refreshTokenRecord);
         if (refreshTokenIsValid) {
         const permissions = [];
         const allPermissions =user.role.permissionsRoles;
@@ -51,17 +56,17 @@ export default async (req, res, next) => {
           const token = jwt.sign(loginUser, ACCESS_TOKEN, { expiresIn: `${ACCESS_TOKEN_EXPIRE}s` });
 
           //remove all records belong to this user
-          await req.models.RefreshToken.destroy({where:{
+          await RefreshToken.destroy({where:{
             user_id:user.id
           }})
 
-          const refreshToken = await req.models.RefreshToken.createToken(user.id);
+          const refreshToken = await RefreshToken.createToken(user.id);
           res.setHeader("token",`Bearer ${token}`);
           res.setHeader("refreshToken",refreshToken);
           req.user =loginUser
           next();
         }else{
-          await req.models.RefreshToken.destroy({where:{
+          await RefreshToken.destroy({where:{
             user_id:user.id
           }})
           return res.sendError( 401, "Invalid Token Please Login Again");
