@@ -7,5 +7,6 @@ export const {
   ACCESS_TOKEN,
   ACCESS_TOKEN_EXPIRE,
   REFRESH_TOKEN_EXPIRE,
+  EXPIRE_REDIS_FETCHUSERS
 } = process.env;
 

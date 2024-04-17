@@ -1,16 +1,24 @@
 import bcrypt from "bcrypt";
+import Redis from 'ioredis';
 
 import {User} from '../models/user.js';
 import {Role} from '../models/role.js';
 import { userValidator } from "../utils/input-validator.js";
+import {EXPIRE_REDIS_FETCHUSERS} from '../config.js';
 
 export class UserController {
   static async fetchAllUsers(req, res) {
     try {
+      const redis = new Redis();
+      if(await redis.exists("fetchAllUsers")){
+        const users =await redis.get("fetchAllUsers");
+        return res.sendSuccess(200,"All Users Fetch Successfully" ,JSON.parse(users));
+      }
       const users = await User.findAll({
         include: [Role],
         attributes: ["id", "name", "login"],
       });
+      await redis.setex("fetchAllUsers",Number(EXPIRE_REDIS_FETCHUSERS),JSON.stringify(users))
       return res.sendSuccess(200,"All Users Fetch Successfully" ,users)
     } catch (err) {
       return res.sendError();
